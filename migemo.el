@@ -534,6 +534,47 @@ into the migemo's regexp pattern."
 	    (migemo-backward (ad-get-arg 0) (ad-get-arg 1) (ad-get-arg 2) (ad-get-arg 3)))
     ad-do-it))
 
+(when (and (boundp 'isearch-regexp-lax-whitespace)
+	   (fboundp 're-search-forward-lax-whitespace)
+	   (fboundp 'search-forward-lax-whitespace))
+  (setq isearch-search-fun-function 'isearch-search-fun-migemo)
+
+  (defun isearch-search-fun-migemo ()
+	"Return default functions to use for the search with migemo."
+	(cond
+	 (isearch-word
+	  (lambda (string &optional bound noerror count)
+	;; Use lax versions to not fail at the end of the word while
+	;; the user adds and removes characters in the search string
+	;; (or when using nonincremental word isearch)
+	(let ((lax (not (or isearch-nonincremental
+				(eq (length isearch-string)
+				(length (isearch--state-string
+					 (car isearch-cmds))))))))
+	  (funcall
+	   (if isearch-forward #'re-search-forward #'re-search-backward)
+	   (if (functionp isearch-word)
+		   (funcall isearch-word string lax)
+		 (word-search-regexp string lax))
+	   bound noerror count))))
+	 ((and isearch-regexp isearch-regexp-lax-whitespace
+	   search-whitespace-regexp)
+	  (if isearch-forward
+	  're-search-forward-lax-whitespace
+	're-search-backward-lax-whitespace))
+	 (isearch-regexp
+	  (if isearch-forward 're-search-forward 're-search-backward))
+	 ((and isearch-lax-whitespace search-whitespace-regexp migemo-do-isearch)
+	  (if isearch-forward 'migemo-forward 'migemo-backward))
+	 ((and isearch-lax-whitespace search-whitespace-regexp)
+	  (if isearch-forward 'search-forward-lax-whitespace
+	'search-backward-lax-whitespace))
+	 (migemo-do-isearch
+	  (if isearch-forward 'migemo-forward 'migemo-backward))
+	 (t
+	  (if isearch-forward 'search-forward 'search-backward))))
+  )
+
 ;; Turn off input-method automatically when C-s or C-r are typed.
 (defadvice isearch-mode (before migemo-search-ad activate)
   "adviced by migemo."
