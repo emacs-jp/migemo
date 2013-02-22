@@ -1,11 +1,12 @@
-;; -*- mode: Emacs-Lisp; coding: euc-jp-unix; lexical-binding: t -*-
-;;; migemo.el - Japanese incremental search trough dynamic pattern expansion
+;;; migemo.el --- Japanese incremental search trough dynamic pattern expansion
 
 ;; $Id: migemo.el.in,v 1.9 2012/06/24 04:09:59 kaworu Exp $
 ;; Copyright (C) Satoru Takabayashi
 
 ;; Author: Satoru Takabayashi <satoru-t@is.aist-nara.ac.jp>
-;; Keywords: 
+;; URL: https://github.com/emacs-jp/migemo
+;; Version: 1.0
+;; Keywords:
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,7 +25,7 @@
 
 ;;; Commentary:
 
-;; 
+;;
 
 ;;; Code:
 (defgroup migemo nil
@@ -89,7 +90,7 @@
   :group 'migemo
   :type '(choice (const :tag "Do not use" nil)
 		 function))
-		 
+
 (defcustom migemo-after-conv-function nil
   "*Function of migemo after-conversion."
   :group 'migemo
@@ -174,11 +175,11 @@
 	       "t"
 	     "nil")))
 
-(defun migemo-start-process (name buffer program args) 
+(defun migemo-start-process (name buffer program args)
   (let ((proc (apply 'start-process name buffer program args)))
     (if (fboundp 'set-process-coding-system)
-	(set-process-coding-system proc 
-				   migemo-coding-system 
+	(set-process-coding-system proc
+				   migemo-coding-system
 				   migemo-coding-system)
       (set-process-input-coding-system  proc migemo-coding-system)
       (set-process-output-coding-system proc migemo-coding-system))
@@ -208,7 +209,7 @@
 			     (list "-r" migemo-regex-dictionary))
 			   (list "-d" migemo-dictionary)))))
 	(setq migemo-buffer (get-buffer-create " *migemo*"))
-	(setq migemo-process (migemo-start-process 
+	(setq migemo-process (migemo-start-process
 			      "migemo" migemo-buffer migemo-command options))
 	(process-kill-without-query migemo-process)
 	t)))
@@ -414,7 +415,7 @@ into the migemo's regexp pattern."
   "*Face of migemo-dabbrev overlay."
   :group 'migemo
   :type 'face)
-  
+
 (defvar migemo-dabbrev-pattern nil)
 (defvar migemo-dabbrev-start-point nil)
 (defvar migemo-dabbrev-search-point nil)
@@ -673,7 +674,7 @@ This function used with Megemo feature."
 	      (define-key isearch-mode-map "\C-w" 'migemo-isearch-yank-word)
 	      (define-key isearch-mode-map "\C-y" 'migemo-isearch-yank-line)
 	      (define-key isearch-mode-map "\M-m" 'migemo-isearch-toggle-migemo)))
-  
+
   (defun migemo-isearch-toggle-migemo ()
     "Toggle migemo mode in isearch."
     (interactive)
@@ -702,7 +703,7 @@ This function used with Megemo feature."
        (save-excursion
 	 (and (not isearch-forward) isearch-other-end
 	      (goto-char isearch-other-end))
-	 (buffer-substring-no-properties (point) 
+	 (buffer-substring-no-properties (point)
 					 (progn (forward-char 1) (point)))))))
 
   (defun migemo-isearch-yank-word ()
@@ -719,7 +720,7 @@ This function used with Megemo feature."
        (save-excursion
 	 (and (not isearch-forward) isearch-other-end
 	      (goto-char isearch-other-end))
-	 (buffer-substring-no-properties (point) 
+	 (buffer-substring-no-properties (point)
 					 (progn (forward-word 1) (point)))))))
 
   (defun migemo-isearch-yank-line ()
@@ -747,3 +748,10 @@ This function used with Megemo feature."
 ;; sample
 ;; 0123 abcd ABCD ひらがな カタカナ 漢字 !"[#\$]%^&_':`(;)<*=+>,?-@./{|}~
 
+;; Local Variables:
+;; coding: euc-japan-unix
+;; lexical-binding: t
+;; indent-tabs-mode: nil
+;; End:
+
+;;; migemo.el ends here
