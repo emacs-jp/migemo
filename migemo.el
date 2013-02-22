@@ -5,7 +5,7 @@
 
 ;; Author: Satoru Takabayashi <satoru-t@is.aist-nara.ac.jp>
 ;; URL: https://github.com/emacs-jp/migemo
-;; Version: 1.0
+;; Version: 1.9
 ;; Keywords:
 
 ;; This file is free software; you can redistribute it and/or modify
