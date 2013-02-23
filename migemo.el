@@ -1,4 +1,4 @@
-;;; migemo.el --- Japanese incremental search trough dynamic pattern expansion
+;;; migemo.el --- Japanese incremental search through dynamic pattern expansion
 
 ;; $Id: migemo.el.in,v 1.9 2012/06/24 04:09:59 kaworu Exp $
 ;; Copyright (C) Satoru Takabayashi
