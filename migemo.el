@@ -159,6 +159,10 @@
 (defvar migemo-search-pattern-alist nil)
 (defvar migemo-do-isearch nil)
 
+;; For warnings of byte-compile. Following functions are defined in XEmacs
+(declare-function set-process-input-coding-system "code-process")
+(declare-function set-process-output-coding-system "code-process")
+
 (defsubst migemo-search-pattern-get (string)
   (let ((pattern (cdr (assoc string migemo-search-pattern-alist))))
     (unless pattern
@@ -211,7 +215,7 @@
 	(setq migemo-buffer (get-buffer-create " *migemo*"))
 	(setq migemo-process (migemo-start-process
 			      "migemo" migemo-buffer migemo-command options))
-	(process-kill-without-query migemo-process)
+	(set-process-query-on-exit-flag migemo-process nil)
 	t)))
 
 (defun migemo-replace-in-string (string from to)
@@ -244,8 +248,7 @@
 	      (setq migemo-pattern-alist (cons alst (delq alst migemo-pattern-alist)))
 	      (cdr alst))
 	     (t
-	      (save-excursion
-		(set-buffer (process-buffer migemo-process))
+	      (with-current-buffer (process-buffer migemo-process)
 		(delete-region (point-min) (point-max))
 		(process-send-string migemo-process (concat word "\n"))
 		(while (not (and (> (point-max) 1)
@@ -565,9 +568,11 @@ into the migemo's regexp pattern."
 	're-search-backward-lax-whitespace))
 	 (isearch-regexp
 	  (if isearch-forward 're-search-forward 're-search-backward))
-	 ((and isearch-lax-whitespace search-whitespace-regexp migemo-do-isearch)
+	 ((and (if (boundp 'isearch-lax-whitespace) isearch-lax-whitespace t)
+               search-whitespace-regexp migemo-do-isearch)
 	  (if isearch-forward 'migemo-forward 'migemo-backward))
-	 ((and isearch-lax-whitespace search-whitespace-regexp)
+	 ((and (if (boundp 'isearch-lax-whitespace) isearch-lax-whitespace t)
+               search-whitespace-regexp)
 	  (if isearch-forward 'search-forward-lax-whitespace
 	'search-backward-lax-whitespace))
 	 (migemo-do-isearch
