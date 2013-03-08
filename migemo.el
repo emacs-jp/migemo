@@ -342,8 +342,8 @@
 	  (file-coding-system  migemo-coding-system)
 	  (migemo-use-pattern-alist nil)
 	  (migemo-use-frequent-pattern-alist nil)
-	  (migemo-after-conv-function (lambda (x y) y))
-	  word regex)
+	  (migemo-after-conv-function (lambda (_x y) y))
+	  word)
       (setq migemo-frequent-pattern-alist nil)
       (with-temp-buffer
 	(insert-file-contents fcfile)
