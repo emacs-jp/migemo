@@ -553,8 +553,9 @@ into the migemo's regexp pattern."
 	;; (or when using nonincremental word isearch)
 	(let ((lax (not (or isearch-nonincremental
 				(eq (length isearch-string)
-				(length (isearch--state-string
-					 (car isearch-cmds))))))))
+				(length (if (fboundp 'isearch--state-string)
+                                            (isearch--state-string (car isearch-cmds))
+                                          (isearch-string-state (car isearch-cmds)))))))))
 	  (funcall
 	   (if isearch-forward #'re-search-forward #'re-search-backward)
 	   (if (functionp isearch-word)
