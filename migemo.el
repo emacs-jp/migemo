@@ -276,20 +276,20 @@
 
 (defun migemo-pattern-alist-load (file)
   "Load migemo alist file."
-  (let ((coding-system-for-read migemo-coding-system)
-	(file-coding-system-for-read migemo-coding-system))
-    (setq file (expand-file-name file))
-    (when (file-readable-p file)
-      (with-temp-buffer
-	(insert-file-contents file)
-	(goto-char (point-min))
-	(condition-case err
-	    (read (current-buffer))
-	  (error
-	   (message "Error while reading %s; %s"
-		    (file-name-nondirectory file)
-		    (error-message-string err))
-	   nil))))))
+  (setq file (expand-file-name file))
+  (when (file-readable-p file)
+    (with-temp-buffer
+      (let ((coding-system-for-read migemo-coding-system)
+            (buffer-file-coding-system migemo-coding-system)))
+      (insert-file-contents file)
+      (goto-char (point-min))
+      (condition-case err
+          (read (current-buffer))
+        (error
+         (message "Error while reading %s; %s"
+                  (file-name-nondirectory file)
+                  (error-message-string err))
+         nil)))))
 
 (defun migemo-pattern-alist-save (&optional clear)
   "Save migemo alist file."
@@ -297,9 +297,7 @@
   (when (and migemo-use-pattern-alist
 	     migemo-pattern-alist-file
 	     (or migemo-pattern-alist clear))
-    (let ((file (expand-file-name migemo-pattern-alist-file))
-	  (coding-system-for-write migemo-coding-system)
-	  (file-coding-system  migemo-coding-system))
+    (let ((file (expand-file-name migemo-pattern-alist-file)))
       (when (file-writable-p file)
 	(when clear
 	  (setq migemo-pattern-alist nil))
@@ -308,10 +306,12 @@
 	  (setcdr (nthcdr (1- migemo-pattern-alist-length)
 			  migemo-pattern-alist) nil))
 	(with-temp-buffer
-	  (if (fboundp 'pp)
-	      (pp migemo-pattern-alist (current-buffer))
-	    (prin1 migemo-pattern-alist (current-buffer)))
-	  (write-region (point-min) (point-max) file nil 'nomsg))
+	  (let ((coding-system-for-write migemo-coding-system)
+                (buffer-file-coding-system migemo-coding-system))
+            (if (fboundp 'pp)
+                (pp migemo-pattern-alist (current-buffer))
+              (prin1 migemo-pattern-alist (current-buffer)))
+            (write-region (point-min) (point-max) file nil 'nomsg)))
 	(setq migemo-pattern-alist nil)))))
 
 (defun migemo-kill ()
@@ -338,14 +338,14 @@
     (migemo-kill)
     (migemo-init)
     (let ((file (expand-file-name migemo-frequent-pattern-alist-file))
-	  (coding-system-for-write migemo-coding-system)
-	  (file-coding-system  migemo-coding-system)
 	  (migemo-use-pattern-alist nil)
 	  (migemo-use-frequent-pattern-alist nil)
-	  (migemo-after-conv-function (lambda (x y) y))
-	  word regex)
+	  (migemo-after-conv-function (lambda (_x y) y))
+	  word)
       (setq migemo-frequent-pattern-alist nil)
       (with-temp-buffer
+        (let ((coding-system-for-write migemo-coding-system)
+              (buffer-file-coding-system migemo-coding-system)))
 	(insert-file-contents fcfile)
 	(goto-char (point-min))
 	(message "Make frequently pattern...")
@@ -553,8 +553,9 @@ into the migemo's regexp pattern."
 	;; (or when using nonincremental word isearch)
 	(let ((lax (not (or isearch-nonincremental
 				(eq (length isearch-string)
-				(length (isearch--state-string
-					 (car isearch-cmds))))))))
+				(length (if (fboundp 'isearch--state-string)
+                                            (isearch--state-string (car isearch-cmds))
+                                          (isearch-string-state (car isearch-cmds)))))))))
 	  (funcall
 	   (if isearch-forward #'re-search-forward #'re-search-backward)
 	   (if (functionp isearch-word)
