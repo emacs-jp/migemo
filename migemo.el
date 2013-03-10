@@ -98,14 +98,15 @@
 		 function))
 
 (defcustom migemo-coding-system
-  (if (>= emacs-major-version 20)
-      (if (featurep 'mule)
-	  (if (string-match "XEmacs" emacs-version)
-	      (cond
-	       ((memq 'euc-japan-unix (coding-system-list)) 'euc-japan-unix)
-	       ((memq 'euc-jp-unix (coding-system-list)) 'euc-jp-unix))
-	    'euc-japan-unix))
-    (and (boundp 'MULE) *euc-japan*unix))
+  (with-no-warnings
+    (if (>= emacs-major-version 20)
+        (if (featurep 'mule)
+            (if (string-match "XEmacs" emacs-version)
+                (cond
+                 ((memq 'euc-japan-unix (coding-system-list)) 'euc-japan-unix)
+                 ((memq 'euc-jp-unix (coding-system-list)) 'euc-jp-unix))
+              'euc-japan-unix))
+      (and (boundp 'MULE) *euc-japan*unix)))
   "*Default coding system for migemo.el"
   :group 'migemo
   :type 'coding-system)
@@ -551,11 +552,12 @@ into the migemo's regexp pattern."
 	;; Use lax versions to not fail at the end of the word while
 	;; the user adds and removes characters in the search string
 	;; (or when using nonincremental word isearch)
-	(let ((lax (not (or isearch-nonincremental
+	(let* ((state-string-func (if (fboundp 'isearch--state-string)
+				      'isearch--state-string
+				    'isearch-string-state))
+               (lax (not (or isearch-nonincremental
 				(eq (length isearch-string)
-				(length (if (fboundp 'isearch--state-string)
-                                            (isearch--state-string (car isearch-cmds))
-                                          (isearch-string-state (car isearch-cmds)))))))))
+				(length (funcall state-string-func (car isearch-cmds))))))))
 	  (funcall
 	   (if isearch-forward #'re-search-forward #'re-search-backward)
 	   (if (functionp isearch-word)
