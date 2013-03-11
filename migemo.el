@@ -173,6 +173,7 @@
 		  migemo-search-pattern-alist)))
     pattern))
 
+;;;###autoload
 (defun migemo-toggle-isearch-enable ()
   (interactive)
   (setq migemo-isearch-enable-p (not migemo-isearch-enable-p))
@@ -292,6 +293,7 @@
                   (error-message-string err))
          nil)))))
 
+;;;###autoload
 (defun migemo-pattern-alist-save (&optional clear)
   "Save migemo alist file."
   (interactive)
@@ -315,6 +317,7 @@
             (write-region (point-min) (point-max) file nil 'nomsg)))
 	(setq migemo-pattern-alist nil)))))
 
+;;;###autoload
 (defun migemo-kill ()
   "Kill migemo process"
   (interactive)
@@ -324,6 +327,7 @@
     (when (get-buffer migemo-buffer)
       (kill-buffer migemo-buffer))))
 
+;;;###autoload
 (defun migemo-pattern-alist-clear ()
   "Clear migemo alist data & file."
   (interactive)
@@ -331,6 +335,7 @@
   (migemo-pattern-alist-save 'clear)
   (migemo-init))
 
+;;;###autoload
 (defun migemo-frequent-pattern-make (fcfile)
   "Create frequent pattern from `frequent-chars'."
   (interactive "ffrequent-chars: ")
@@ -370,6 +375,7 @@
       (migemo-init)
       (message "Make frequently pattern...done"))))
 
+;;;###autoload
 (defun migemo-expand-pattern () "\
 Expand the Romaji sequences on the left side of the cursor
 into the migemo's regexp pattern."
@@ -384,6 +390,7 @@ into the migemo's regexp pattern."
       (delete-region (point) pos)
       (insert jrpat))))
 
+;;;###autoload
 (defun migemo-forward (word &optional bound noerror count)
   (interactive "sSearch: \nP\nP")
   (if (delq 'ascii (find-charset-string word))
@@ -391,6 +398,7 @@ into the migemo's regexp pattern."
     (setq migemo-search-pattern (migemo-search-pattern-get word)))
   (search-forward-regexp migemo-search-pattern bound noerror count))
 
+;;;###autoload
 (defun migemo-backward (word &optional bound noerror count)
   (interactive "sSearch backward: \nP\nP")
   (if (delq 'ascii (find-charset-string word))
@@ -433,6 +441,7 @@ into the migemo's regexp pattern."
   (when migemo-dabbrev-ol
     (delete-overlay migemo-dabbrev-ol)))
 
+;;;###autoload
 (defun migemo-dabbrev-expand ()
   (interactive)
   (let ((end-pos (point))
