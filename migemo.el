@@ -1,4 +1,4 @@
-;;; migemo.el --- Japanese incremental search through dynamic pattern expansion
+;;; migemo.el --- Japanese incremental search through dynamic pattern expansion -*- lexical-binding: t; -*-
 
 ;; $Id: migemo.el.in,v 1.9 2012/06/24 04:09:59 kaworu Exp $
 ;; Copyright (C) Satoru Takabayashi
@@ -758,7 +758,6 @@ This function used with Megemo feature."
 
 ;; Local Variables:
 ;; coding: euc-japan-unix
-;; lexical-binding: t
 ;; indent-tabs-mode: nil
 ;; End:
 
