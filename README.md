@@ -18,7 +18,7 @@ migemo.el provides Japanese increment search with 'Romanization of Japanese'(ロ
 
 ### cmigemo
 
-````elisp
+```el
 (require 'migemo)
 (setq migemo-command "cmigemo")
 (setq migemo-options '("-q" "--emacs"))
@@ -31,4 +31,4 @@ migemo.el provides Japanese increment search with 'Romanization of Japanese'(ロ
 (setq migemo-coding-system 'utf-8-unix)
 (load-library "migemo")
 (migemo-init)
-````
+```
