@@ -69,8 +69,9 @@
   :type 'boolean)
 
 (defcustom migemo-use-default-isearch-keybinding t
-  "*If non-nil, set migemo default keybinding for isearch"
-  :group 'migemo)
+  "*If non-nil, set migemo default keybinding for isearch in `migemo-init'."
+  :group 'migemo
+  :type 'boolean)
 
 (defcustom migemo-dictionary (expand-file-name "migemo-dict" migemo-directory)
   "*Migemo dictionary file."
