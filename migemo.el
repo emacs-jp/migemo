@@ -7,6 +7,7 @@
 ;; URL: https://github.com/emacs-jp/migemo
 ;; Version: 1.9.1
 ;; Keywords:
+;; Package-Requires: ((cl-lib "0.5"))
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -28,6 +29,9 @@
 ;;
 
 ;;; Code:
+
+(require 'cl-lib)
+
 (defgroup migemo nil
   "migemo - Japanese incremental search trough dynamic pattern expansion."
   :group 'matching)
@@ -552,6 +556,13 @@ into the migemo's regexp pattern."
 	   (fboundp 're-search-forward-lax-whitespace)
 	   (fboundp 'search-forward-lax-whitespace))
   (setq isearch-search-fun-function 'isearch-search-fun-migemo)
+
+  (defadvice multi-isearch-search-fun (after support-migemo activate)
+    (setq ad-return-value
+	  `(lambda (string bound noerror)
+	     (cl-letf (((symbol-function 'isearch-search-fun-default)
+			'isearch-search-fun-migemo))
+	       (funcall ,ad-return-value string bound noerror)))))
 
   (defun isearch-search-fun-migemo ()
 	"Return default functions to use for the search with migemo."
