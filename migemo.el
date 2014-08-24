@@ -557,12 +557,13 @@ into the migemo's regexp pattern."
 	   (fboundp 'search-forward-lax-whitespace))
   (setq isearch-search-fun-function 'isearch-search-fun-migemo)
 
-  (defadvice multi-isearch-search-fun (after support-migemo activate)
-    (setq ad-return-value
-	  `(lambda (string bound noerror)
-	     (cl-letf (((symbol-function 'isearch-search-fun-default)
-			'isearch-search-fun-migemo))
-	       (funcall ,ad-return-value string bound noerror)))))
+  (when (fboundp 'isearch-search-fun-default)
+    (defadvice multi-isearch-search-fun (after support-migemo activate)
+      (setq ad-return-value
+            `(lambda (string bound noerror)
+               (cl-letf (((symbol-function 'isearch-search-fun-default)
+                          'isearch-search-fun-migemo))
+                 (funcall ,ad-return-value string bound noerror))))))
 
   (defun isearch-search-fun-migemo ()
 	"Return default functions to use for the search with migemo."
