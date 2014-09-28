@@ -11,6 +11,7 @@ migemo.el provides Japanese increment search with 'Romanization of Japanese'(ロ
 ## Requirements
 
 * Emacs 24 or higher.
+* cl-lib.el
 * [cmigemo](https://github.com/koron/cmigemo) or [CVS Head migemo](http://0xcc.net/migemo/)
 
 
