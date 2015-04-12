@@ -652,36 +652,23 @@ into the migemo's regexp pattern."
 (defvar isearch-lazy-highlight-start)
 (defvar isearch-lazy-highlight-end)
 
-(defun migemo-isearch-lazy-highlight-search ()
-  "Search ahead for the next or previous match, for lazy highlighting.
-Attempt to do the search exactly the way the pending isearch would.
-This function used with Megemo feature."
-  (let ((case-fold-search isearch-case-fold-search)
-        (choices (cond (isearch-word
-                        '(word-search-forward word-search-backward))
-                       (isearch-regexp
-                        '(re-search-forward re-search-backward))
-                       (migemo-isearch-enable-p
-                        '(re-search-forward re-search-backward t))
-                       (t
-                        '(search-forward search-backward))))
-	(pattern isearch-string))
-    (when (nth 2 choices)
-     (setq pattern (migemo-search-pattern-get isearch-string)))
-    (funcall (if isearch-forward
-		 (nth 0 choices) (nth 1 choices))
-	     pattern
-             (if isearch-forward
-                 (if isearch-lazy-highlight-wrapped
-                     isearch-lazy-highlight-start
-                   (window-end))
-               (if isearch-lazy-highlight-wrapped
-                   isearch-lazy-highlight-end
-                 (window-start)))
-             t)))
+(when (fboundp 'isearch-lazy-highlight-new-loop)
+  (defadvice isearch-lazy-highlight-new-loop (around migemo-isearch-lazy-highlight-new-loop
+                                                     activate)
+    "adviced by migemo"
+    (if (and migemo-isearch-enable-p
+             (not isearch-word)
+             (not isearch-regexp))
+        (let ((isearch-string (migemo-search-pattern-get isearch-string))
+              (isearch-regexp t))
+          ad-do-it)
+      ad-do-it)))
 
-(when (fboundp 'isearch-lazy-highlight-search)
-  (defalias 'isearch-lazy-highlight-search 'migemo-isearch-lazy-highlight-search))
+(when (fboundp 'replace-highlight)
+  (defadvice replace-highlight (around migemo-replace-highlight activate)
+    "adviced by migemo"
+    (let ((migemo-isearch-enable-p nil))
+      ad-do-it)))
 
 ;;;; for isearch-highlightify-region (XEmacs 21)
 (when (fboundp 'isearch-highlightify-region)
