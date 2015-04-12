@@ -193,7 +193,8 @@
 	     "nil")))
 
 (defun migemo-start-process (name buffer program args)
-  (let ((proc (apply 'start-process name buffer program args)))
+  (let* ((process-connection-type nil)
+         (proc (apply 'start-process name buffer program args)))
     (if (fboundp 'set-process-coding-system)
 	(set-process-coding-system proc
 				   migemo-coding-system
