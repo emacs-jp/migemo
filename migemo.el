@@ -162,6 +162,8 @@
 (defvar migemo-process nil)
 (defvar migemo-buffer nil)
 (defvar migemo-current-input-method nil)
+(defvar migemo-current-input-method-title nil)
+(defvar migemo-input-method-function nil)
 (defvar migemo-search-pattern nil)
 (defvar migemo-pattern-alist nil)
 (defvar migemo-frequent-pattern-alist nil)
@@ -613,11 +615,21 @@ into the migemo's regexp pattern."
   (when (and migemo-isearch-enable-p
 	     (boundp 'current-input-method))
     (setq migemo-current-input-method current-input-method)
+    (setq migemo-current-input-method-title current-input-method-title)
+    (setq migemo-input-method-function input-method-function)
     (when (and migemo-mw32-input-method
 	       (stringp migemo-current-input-method)
 	       (string= migemo-current-input-method migemo-mw32-input-method))
       (set-input-method nil))
-    (setq current-input-method nil)))
+    (setq current-input-method nil)
+    (setq current-input-method-title nil)
+    (setq input-method-function nil)
+    (when migemo-current-input-method
+      (unwind-protect
+          (run-hooks
+           'input-method-inactivate-hook
+           'input-method-deactivate-hook)
+        (force-mode-line-update)))))
 
 (defadvice isearch-done (after migemo-search-ad activate)
   "adviced by migemo."
@@ -629,7 +641,17 @@ into the migemo's regexp pattern."
 	       (stringp migemo-current-input-method)
 	       (string= migemo-current-input-method migemo-mw32-input-method))
       (set-input-method migemo-current-input-method))
-    (setq current-input-method migemo-current-input-method)))
+    (let ((state-changed-p (not (equal current-input-method migemo-current-input-method))))
+      (setq current-input-method migemo-current-input-method)
+      (setq current-input-method-title migemo-current-input-method-title)
+      (setq input-method-function migemo-input-method-function)
+      (when state-changed-p
+        (unwind-protect
+            (apply #'run-hooks (if current-input-method
+                                   '(input-method-activate-hook)
+                                 '(input-method-inactivate-hook
+                                   input-method-deactivate-hook)))
+          (force-mode-line-update))))))
 
 (defcustom migemo-message-prefix-face 'highlight
   "*Face of minibuffer prefix"
