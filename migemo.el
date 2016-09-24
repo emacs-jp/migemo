@@ -523,6 +523,10 @@ into the migemo's regexp pattern."
 		       migemo-dabbrev-pattern)))
     (add-hook 'pre-command-hook 'migemo-dabbrev-expand-done)))
 
+(defsubst migemo--isearch-regexp-function ()
+  (or (bound-and-true-p isearch-regexp-function)
+      (bound-and-true-p isearch-word)))
+
 ;; Use migemo-{forward,backward} instead of search-{forward,backward}.
 (defadvice isearch-search (around migemo-search-ad activate)
   "adviced by migemo."
@@ -536,7 +540,7 @@ into the migemo's regexp pattern."
   "adviced by migemo."
   (let ((isearch-adjusted isearch-adjusted))
     (when (and migemo-isearch-enable-p
-	       (not isearch-forward) (not isearch-regexp) (not isearch-word))
+	       (not isearch-forward) (not isearch-regexp) (not (migemo--isearch-regexp-function)))
       ;; don't use 'looking-at'
       (setq isearch-adjusted t))
     ad-do-it))
@@ -571,7 +575,7 @@ into the migemo's regexp pattern."
   (defun isearch-search-fun-migemo ()
 	"Return default functions to use for the search with migemo."
 	(cond
-	 (isearch-word
+	 ((migemo--isearch-regexp-function)
 	  (lambda (string &optional bound noerror count)
 	;; Use lax versions to not fail at the end of the word while
 	;; the user adds and removes characters in the search string
@@ -584,8 +588,8 @@ into the migemo's regexp pattern."
 				(length (funcall state-string-func (car isearch-cmds))))))))
 	  (funcall
 	   (if isearch-forward #'re-search-forward #'re-search-backward)
-	   (if (functionp isearch-word)
-		   (funcall isearch-word string lax)
+	   (if (functionp (migemo--isearch-regexp-function))
+		   (funcall (migemo--isearch-regexp-function) string lax)
 		 (word-search-regexp string lax))
 	   bound noerror count))))
 	 ((and isearch-regexp isearch-regexp-lax-whitespace
@@ -666,7 +670,7 @@ into the migemo's regexp pattern."
     (when migemo-emacs21p
       (put-text-property 0 (length str) 'face migemo-message-prefix-face str))
     (when (and migemo-isearch-enable-p
-	       (not (or isearch-regexp isearch-word)))
+	       (not (or isearch-regexp (migemo--isearch-regexp-function))))
       (setq ad-return-value (concat str " " ret)))))
 
 ;;;; for isearch-lazy-highlight (Emacs 21)
@@ -680,7 +684,7 @@ into the migemo's regexp pattern."
                                                      activate)
     "adviced by migemo"
     (if (and migemo-isearch-enable-p
-             (not isearch-word)
+             (not (migemo--isearch-regexp-function))
              (not isearch-regexp))
         (let ((isearch-string (migemo-search-pattern-get isearch-string))
               (isearch-regexp t))
@@ -718,7 +722,7 @@ into the migemo's regexp pattern."
   (defun migemo-isearch-toggle-migemo ()
     "Toggle migemo mode in isearch."
     (interactive)
-    (unless (or isearch-regexp isearch-word)
+    (unless (or isearch-regexp (migemo--isearch-regexp-function))
       (discard-input)
       (setq migemo-isearch-enable-p (not migemo-isearch-enable-p)))
     (when (fboundp 'isearch-lazy-highlight-new-loop)
