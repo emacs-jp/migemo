@@ -171,6 +171,7 @@
 (defvar migemo-search-pattern-alist nil)
 (defvar migemo-do-isearch nil)
 (defvar migemo-register-isearch-keybinding-function nil)
+(defvar migemo-process-insertion-pattern nil)
 
 ;; For warnings of byte-compile. Following functions are defined in XEmacs
 (declare-function set-process-input-coding-system "code-process")
@@ -217,6 +218,10 @@
   (when (and migemo-use-default-isearch-keybinding
              migemo-register-isearch-keybinding-function)
     (funcall migemo-register-isearch-keybinding-function))
+  (setq migemo-process-insertion-pattern
+        (if (string-match "cmigemo" migemo-command)
+            "\\s-*"
+          "\a"))
   (or (and migemo-process
 	   (eq (process-status migemo-process) 'run))
       (let ((options
@@ -289,7 +294,9 @@
       (if (and migemo-after-conv-function
 	       (functionp migemo-after-conv-function))
 	  (funcall migemo-after-conv-function word pattern)
-	(migemo-replace-in-string pattern "\a" migemo-white-space-regexp))))))
+	(migemo-replace-in-string pattern
+                                  migemo-process-insertion-pattern
+                                  migemo-white-space-regexp))))))
 
 (defun migemo-pattern-alist-load (file)
   "Load migemo alist file."
