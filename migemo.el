@@ -59,7 +59,7 @@
 ;; (setq migemo-options '("-S" "migemo" "-t" "emacs" "-i" "\a"))
 ;; (setq migemo-dictionary "somewhere/migemo/utf-8/migemo-dict")
 ;; (setq migemo-user-dictionary nil)
-;; (setq migemo-regex-dictionary nil))
+;; (setq migemo-regex-dictionary nil)
 
 (defcustom migemo-directory nil
   "*Directory where migemo files are placed."
@@ -129,12 +129,14 @@
   :group 'migemo
   :type 'integer)
 
-(defcustom migemo-pattern-alist-file (expand-file-name ".migemo-pattern" user-emacs-directory)
+(defcustom migemo-pattern-alist-file
+  (locate-user-emacs-file "migemo-pattern" ".migemo-pattern")
   "*Path of migemo alist file. If nil, don't save and restore the file."
   :group 'migemo
   :type 'file)
 
-(defcustom migemo-frequent-pattern-alist-file (expand-file-name ".migemo-frequent" user-emacs-directory)
+(defcustom migemo-frequent-pattern-alist-file
+  (locate-user-emacs-file "migemo-frequent" ".migemo-freqent")
   "*Path of migemo frequent alist file. If nil, don't save and restore the file."
   :group 'migemo
   :type 'file)
@@ -609,10 +611,6 @@ into the migemo's regexp pattern."
     (setq migemo-current-input-method current-input-method)
     (setq migemo-current-input-method-title current-input-method-title)
     (setq migemo-input-method-function input-method-function)
-    (when (and migemo-mw32-input-method
-           (stringp migemo-current-input-method)
-           (string= migemo-current-input-method migemo-mw32-input-method))
-      (set-input-method nil))
     (setq current-input-method nil)
     (setq current-input-method-title nil)
     (setq input-method-function nil)
