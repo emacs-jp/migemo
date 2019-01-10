@@ -627,10 +627,6 @@ into the migemo's regexp pattern."
   (setq migemo-search-pattern-alist nil)
   (when (and migemo-isearch-enable-p
          (boundp 'current-input-method))
-    (when (and migemo-mw32-input-method
-           (stringp migemo-current-input-method)
-           (string= migemo-current-input-method migemo-mw32-input-method))
-      (set-input-method migemo-current-input-method))
     (let ((state-changed-p (not (equal current-input-method migemo-current-input-method))))
       (setq current-input-method migemo-current-input-method)
       (setq current-input-method-title migemo-current-input-method-title)
