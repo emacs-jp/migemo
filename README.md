@@ -13,16 +13,20 @@ migemo.el provides Japanese increment search with 'Romanization of Japanese'(ロ
 * Emacs 24 or higher.
 * cl-lib.el
 * [cmigemo](https://github.com/koron/cmigemo) or [CVS Head migemo](http://0xcc.net/migemo/)
-
+  * We recommend to use cmigemo. It is default since version 1.9.2
 
 ## Sample Configuration
 
-### cmigemo
-
 ```lisp
 (require 'migemo)
+
+;; cmigemo(default)
 (setq migemo-command "cmigemo")
 (setq migemo-options '("-q" "--emacs"))
+
+;; ruby migemo
+(setq migemo-command "ruby")
+(setq migemo-options '("-S" "migemo" "-t" "emacs" "-i" "\a"))
 
 ;; Set your installed path
 (setq migemo-dictionary "/usr/local/share/migemo/utf-8/migemo-dict")

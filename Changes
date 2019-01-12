@@ -1,0 +1,11 @@
+Revision history for quickrun.el
+
+Version 1.9.2  2019/01/12
+  - Use cmigemo as default from ruby migemo
+  - Convert encoding from euc-jp to utf-8 for encoding issue at byte-compiling
+
+Version 1.9.1  2014/07/10
+  - support melpa
+
+Version 1.9.0  2013/02/23
+  - Port from http://0xcc.net/migemo/
