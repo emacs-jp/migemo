@@ -173,16 +173,16 @@
     (unless pattern
       (setq pattern (migemo-get-pattern string))
       (setq migemo-search-pattern-alist
-        (cons (cons string pattern)
-          migemo-search-pattern-alist)))
+            (cons (cons string pattern)
+                  migemo-search-pattern-alist)))
     pattern))
 
 (defun migemo-toggle-isearch-enable ()
   (interactive)
   (setq migemo-isearch-enable-p (not migemo-isearch-enable-p))
   (message (if migemo-isearch-enable-p
-           "t"
-         "nil")))
+               "t"
+             "nil")))
 
 (defun migemo-start-process (name buffer program args)
   (let* ((process-connection-type nil)
@@ -197,35 +197,35 @@
 
 (defun migemo-init ()
   (when (and migemo-use-frequent-pattern-alist
-         migemo-frequent-pattern-alist-file
-         (null migemo-frequent-pattern-alist))
+             migemo-frequent-pattern-alist-file
+             (null migemo-frequent-pattern-alist))
     (setq migemo-frequent-pattern-alist
-      (migemo-pattern-alist-load migemo-frequent-pattern-alist-file)))
+          (migemo-pattern-alist-load migemo-frequent-pattern-alist-file)))
   (when (and migemo-use-pattern-alist
-         migemo-pattern-alist-file
-         (null migemo-pattern-alist))
+             migemo-pattern-alist-file
+             (null migemo-pattern-alist))
     (setq migemo-pattern-alist
-      (migemo-pattern-alist-load migemo-pattern-alist-file)))
+          (migemo-pattern-alist-load migemo-pattern-alist-file)))
   (when (and migemo-use-default-isearch-keybinding
              migemo-register-isearch-keybinding-function)
     (funcall migemo-register-isearch-keybinding-function))
   (or (and migemo-process
-       (eq (process-status migemo-process) 'run))
+           (eq (process-status migemo-process) 'run))
       (let ((options
-         (delq nil
-           (append migemo-options
-               (when (and migemo-user-dictionary
-                      (file-exists-p migemo-user-dictionary))
-                 (list "-u" migemo-user-dictionary))
-               (when (and migemo-regex-dictionary
-                      (file-exists-p migemo-regex-dictionary))
-                 (list "-r" migemo-regex-dictionary))
-               (list "-d" migemo-dictionary)))))
-    (setq migemo-buffer (get-buffer-create " *migemo*"))
-    (setq migemo-process (migemo-start-process
-                  "migemo" migemo-buffer migemo-command options))
-    (set-process-query-on-exit-flag migemo-process nil)
-    t)))
+             (delq nil
+                   (append migemo-options
+                           (when (and migemo-user-dictionary
+                                      (file-exists-p migemo-user-dictionary))
+                             (list "-u" migemo-user-dictionary))
+                           (when (and migemo-regex-dictionary
+                                      (file-exists-p migemo-regex-dictionary))
+                             (list "-r" migemo-regex-dictionary))
+                           (list "-d" migemo-dictionary)))))
+        (setq migemo-buffer (get-buffer-create " *migemo*"))
+        (setq migemo-process (migemo-start-process
+                              "migemo" migemo-buffer migemo-command options))
+        (set-process-query-on-exit-flag migemo-process nil)
+        t)))
 
 (defun migemo-replace-in-string (string from to)
   (with-temp-buffer
@@ -245,43 +245,43 @@
       (set-text-properties 0 (length word) nil word)
       (migemo-init)
       (when (and migemo-pre-conv-function
-         (functionp migemo-pre-conv-function))
-    (setq word (funcall migemo-pre-conv-function word)))
+                 (functionp migemo-pre-conv-function))
+        (setq word (funcall migemo-pre-conv-function word)))
       (setq pattern
-        (cond
-         ((setq freq (and migemo-use-frequent-pattern-alist
-                  (assoc word migemo-frequent-pattern-alist)))
-          (cdr freq))
-         ((setq alst (and migemo-use-pattern-alist
-                  (assoc word migemo-pattern-alist)))
-          (setq migemo-pattern-alist (cons alst (delq alst migemo-pattern-alist)))
-          (cdr alst))
-         (t
-          (with-current-buffer (process-buffer migemo-process)
-        (delete-region (point-min) (point-max))
-        (process-send-string migemo-process (concat word "\n"))
-        (while (not (and (> (point-max) 1)
-                 (eq (char-after (1- (point-max))) ?\n)))
-          (accept-process-output migemo-process
-                     0 migemo-accept-process-output-timeout-msec))
-        (setq pattern (buffer-substring (point-min) (1- (point-max)))))
-          (when (and (memq system-type '(windows-nt OS/2 emx))
-             (> (length pattern) 1)
-             (eq ?\r (aref pattern (1- (length pattern)))))
-        (setq pattern (substring pattern 0 -1)))
-          (when migemo-use-pattern-alist
-        (setq migemo-pattern-alist
-              (cons (cons word pattern) migemo-pattern-alist))
-        (when (and migemo-pattern-alist-length
-               (> (length migemo-pattern-alist)
-                  (* migemo-pattern-alist-length 2)))
-          (setcdr (nthcdr (1- (* migemo-pattern-alist-length 2))
-                  migemo-pattern-alist) nil)))
-          pattern)))
+            (cond
+             ((setq freq (and migemo-use-frequent-pattern-alist
+                              (assoc word migemo-frequent-pattern-alist)))
+              (cdr freq))
+             ((setq alst (and migemo-use-pattern-alist
+                              (assoc word migemo-pattern-alist)))
+              (setq migemo-pattern-alist (cons alst (delq alst migemo-pattern-alist)))
+              (cdr alst))
+             (t
+              (with-current-buffer (process-buffer migemo-process)
+                (delete-region (point-min) (point-max))
+                (process-send-string migemo-process (concat word "\n"))
+                (while (not (and (> (point-max) 1)
+                                 (eq (char-after (1- (point-max))) ?\n)))
+                  (accept-process-output migemo-process
+                                         0 migemo-accept-process-output-timeout-msec))
+                (setq pattern (buffer-substring (point-min) (1- (point-max)))))
+              (when (and (memq system-type '(windows-nt OS/2 emx))
+                         (> (length pattern) 1)
+                         (eq ?\r (aref pattern (1- (length pattern)))))
+                (setq pattern (substring pattern 0 -1)))
+              (when migemo-use-pattern-alist
+                (setq migemo-pattern-alist
+                      (cons (cons word pattern) migemo-pattern-alist))
+                (when (and migemo-pattern-alist-length
+                           (> (length migemo-pattern-alist)
+                              (* migemo-pattern-alist-length 2)))
+                  (setcdr (nthcdr (1- (* migemo-pattern-alist-length 2))
+                                  migemo-pattern-alist) nil)))
+              pattern)))
       (if (and migemo-after-conv-function
-           (functionp migemo-after-conv-function))
-      (funcall migemo-after-conv-function word pattern)
-    (migemo-replace-in-string pattern "\a" migemo-white-space-regexp))))))
+               (functionp migemo-after-conv-function))
+          (funcall migemo-after-conv-function word pattern)
+        (migemo-replace-in-string pattern "\a" migemo-white-space-regexp))))))
 
 (defun migemo-pattern-alist-load (file)
   "Load migemo alist file."
@@ -304,24 +304,24 @@
   "Save migemo alist file."
   (interactive)
   (when (and migemo-use-pattern-alist
-         migemo-pattern-alist-file
-         (or migemo-pattern-alist clear))
+             migemo-pattern-alist-file
+             (or migemo-pattern-alist clear))
     (let ((file (expand-file-name migemo-pattern-alist-file)))
       (when (file-writable-p file)
-    (when clear
-      (setq migemo-pattern-alist nil))
-    (when (and migemo-pattern-alist-length
-           (> (length migemo-pattern-alist) migemo-pattern-alist-length))
-      (setcdr (nthcdr (1- migemo-pattern-alist-length)
-              migemo-pattern-alist) nil))
-    (with-temp-buffer
-      (let ((coding-system-for-write migemo-coding-system)
+        (when clear
+          (setq migemo-pattern-alist nil))
+        (when (and migemo-pattern-alist-length
+                   (> (length migemo-pattern-alist) migemo-pattern-alist-length))
+          (setcdr (nthcdr (1- migemo-pattern-alist-length)
+                          migemo-pattern-alist) nil))
+        (with-temp-buffer
+          (let ((coding-system-for-write migemo-coding-system)
                 (buffer-file-coding-system migemo-coding-system))
             (if (fboundp 'pp)
                 (pp migemo-pattern-alist (current-buffer))
               (prin1 migemo-pattern-alist (current-buffer)))
             (write-region (point-min) (point-max) file nil 'nomsg)))
-    (setq migemo-pattern-alist nil)))))
+        (setq migemo-pattern-alist nil)))))
 
 (defun migemo-kill ()
   "Kill migemo process"
@@ -347,33 +347,33 @@
     (migemo-kill)
     (migemo-init)
     (let ((file (expand-file-name migemo-frequent-pattern-alist-file))
-      (migemo-use-pattern-alist nil)
-      (migemo-use-frequent-pattern-alist nil)
-      (migemo-after-conv-function (lambda (_x y) y))
-      word)
+          (migemo-use-pattern-alist nil)
+          (migemo-use-frequent-pattern-alist nil)
+          (migemo-after-conv-function (lambda (_x y) y))
+          word)
       (setq migemo-frequent-pattern-alist nil)
       (with-temp-buffer
         (let ((coding-system-for-write migemo-coding-system)
               (buffer-file-coding-system migemo-coding-system)))
-    (insert-file-contents fcfile)
-    (goto-char (point-min))
-    (message "Make frequently pattern...")
-    (while (not (eobp))
-      (when (looking-at "^[a-z]+$")
-        (setq word (match-string 0))
-        (message "Make frequently pattern...%s" word)
-        (setq migemo-frequent-pattern-alist
-          (cons (cons word (migemo-get-pattern word))
-            migemo-frequent-pattern-alist)))
-      (forward-line 1))
-    (when (file-writable-p file)
-      (setq migemo-frequent-pattern-alist
-        (nreverse migemo-frequent-pattern-alist))
-      (erase-buffer)
-      (if (fboundp 'pp)
-          (pp migemo-frequent-pattern-alist (current-buffer))
-        (prin1 migemo-frequent-pattern-alist (current-buffer)))
-      (write-region (point-min) (point-max) file nil 'nomsg)))
+        (insert-file-contents fcfile)
+        (goto-char (point-min))
+        (message "Make frequently pattern...")
+        (while (not (eobp))
+          (when (looking-at "^[a-z]+$")
+            (setq word (match-string 0))
+            (message "Make frequently pattern...%s" word)
+            (setq migemo-frequent-pattern-alist
+                  (cons (cons word (migemo-get-pattern word))
+                        migemo-frequent-pattern-alist)))
+          (forward-line 1))
+        (when (file-writable-p file)
+          (setq migemo-frequent-pattern-alist
+                (nreverse migemo-frequent-pattern-alist))
+          (erase-buffer)
+          (if (fboundp 'pp)
+              (pp migemo-frequent-pattern-alist (current-buffer))
+            (prin1 migemo-frequent-pattern-alist (current-buffer)))
+          (write-region (point-min) (point-max) file nil 'nomsg)))
       (migemo-kill)
       (migemo-init)
       (message "Make frequently pattern...done"))))
@@ -381,16 +381,16 @@
 (defun migemo-expand-pattern () "\
 Expand the Romaji sequences on the left side of the cursor
 into the migemo's regexp pattern."
-  (interactive)
-  (let ((pos (point)))
-    (goto-char (- pos 1))
-    (if (re-search-backward "[^-a-zA-Z]" (line-beginning-position) t)
-    (forward-char 1)
-      (beginning-of-line))
-    (let* ((str (buffer-substring-no-properties (point) pos))
-       (jrpat (migemo-get-pattern str)))
-      (delete-region (point) pos)
-      (insert jrpat))))
+       (interactive)
+       (let ((pos (point)))
+         (goto-char (- pos 1))
+         (if (re-search-backward "[^-a-zA-Z]" (line-beginning-position) t)
+             (forward-char 1)
+           (beginning-of-line))
+         (let* ((str (buffer-substring-no-properties (point) pos))
+                (jrpat (migemo-get-pattern str)))
+           (delete-region (point) pos)
+           (insert jrpat))))
 
 (defun migemo-forward (word &optional bound noerror count)
   (interactive "sSearch: \nP\nP")
@@ -407,14 +407,14 @@ into the migemo's regexp pattern."
   (if (null migemo-do-isearch)
       (search-backward-regexp migemo-search-pattern bound noerror count)
     (or (and (not (eq this-command 'isearch-repeat-backward))
-         (not (get-char-property (point) 'invisible (current-buffer)))
-         (or (and (looking-at migemo-search-pattern)
-              (match-beginning 0))
-         (and (not (eq (point) (point-min)))
-              (progn (forward-char -1)
-                 (and (looking-at migemo-search-pattern)
-                  (match-beginning 0))))))
-    (search-backward-regexp migemo-search-pattern bound noerror count))))
+             (not (get-char-property (point) 'invisible (current-buffer)))
+             (or (and (looking-at migemo-search-pattern)
+                      (match-beginning 0))
+                 (and (not (eq (point) (point-min)))
+                      (progn (forward-char -1)
+                             (and (looking-at migemo-search-pattern)
+                                  (match-beginning 0))))))
+        (search-backward-regexp migemo-search-pattern bound noerror count))))
 
 ;; experimental
 ;; (define-key global-map "\M-;" 'migemo-dabbrev-expand)
@@ -436,80 +436,80 @@ into the migemo's regexp pattern."
 (defun migemo-dabbrev-expand-done ()
   (remove-hook 'pre-command-hook 'migemo-dabbrev-expand-done)
   (unless (eq last-command this-command)
-      (setq migemo-search-pattern-alist nil)
-      (setq migemo-dabbrev-pre-patterns nil))
+    (setq migemo-search-pattern-alist nil)
+    (setq migemo-dabbrev-pre-patterns nil))
   (when migemo-dabbrev-ol
     (delete-overlay migemo-dabbrev-ol)))
 
 (defun migemo-dabbrev-expand ()
   (interactive)
   (let ((end-pos (point))
-    matched-start matched-string)
+        matched-start matched-string)
     (if (eq last-command this-command)
-    (goto-char migemo-dabbrev-search-point)
+        (goto-char migemo-dabbrev-search-point)
       (goto-char (- end-pos 1))
       (if (re-search-backward "[^a-z-]" (line-beginning-position) t)
-      (forward-char 1)
-    (beginning-of-line))
+          (forward-char 1)
+        (beginning-of-line))
       (setq migemo-search-pattern-alist nil)
       (setq migemo-dabbrev-start-point (point))
       (setq migemo-dabbrev-search-point (point))
       (setq migemo-dabbrev-pattern
-        (buffer-substring-no-properties (point) end-pos))
+            (buffer-substring-no-properties (point) end-pos))
       (setq migemo-dabbrev-pre-patterns nil))
     (if (catch 'found
-      (while (if (> migemo-dabbrev-search-point migemo-dabbrev-start-point)
-             (and (migemo-forward migemo-dabbrev-pattern (point-max) t)
-              (setq migemo-dabbrev-search-point (match-end 0)))
-           (if (migemo-backward migemo-dabbrev-pattern (point-min) t)
-               (setq migemo-dabbrev-search-point (match-beginning 0))
-             (goto-char migemo-dabbrev-start-point)
-             (forward-word 1)
-             (message (format "Trun back for `%s'" migemo-dabbrev-pattern))
-             (and (migemo-forward migemo-dabbrev-pattern (point-max) t)
-              (setq migemo-dabbrev-search-point (match-end 0)))))
-        (setq matched-start (match-beginning 0))
-        (unless (re-search-forward ".\\>" (line-end-position) t)
-          (end-of-line))
-        (setq matched-string (buffer-substring-no-properties matched-start (point)))
-        (unless (member matched-string migemo-dabbrev-pre-patterns)
-          (let ((matched-end (point))
-            (str (copy-sequence matched-string))
-            lstart lend)
-        (if (and (pos-visible-in-window-p matched-start)
-             (pos-visible-in-window-p matched-end))
-            (progn
-              (if migemo-dabbrev-ol
-              (move-overlay migemo-dabbrev-ol matched-start (point))
-            (setq migemo-dabbrev-ol (make-overlay matched-start (point))))
-              (overlay-put migemo-dabbrev-ol 'evaporate t)
-              (overlay-put migemo-dabbrev-ol 'face migemo-dabbrev-ol-face))
-          (when migemo-dabbrev-ol
-            (delete-overlay migemo-dabbrev-ol))
-          (when migemo-dabbrev-display-message
-            (save-excursion
-              (save-restriction
-            (goto-char matched-start)
-            (setq lstart (progn (beginning-of-line) (point)))
-            (setq lend (progn (end-of-line) (point)))
-            (setq str (concat "【" str "】"))
-            (message "(%d): %s%s%s"
-                 (count-lines (point-min) matched-start)
-                 (buffer-substring-no-properties lstart matched-start)
-                 str
-                 (buffer-substring-no-properties matched-end lend)))))))
-          (throw 'found t))
-        (goto-char migemo-dabbrev-search-point)))
-    (progn
-      (setq migemo-dabbrev-pre-patterns
-        (cons matched-string migemo-dabbrev-pre-patterns))
-      (delete-region migemo-dabbrev-start-point end-pos)
-      (forward-char 1)
-      (goto-char migemo-dabbrev-start-point)
-      (insert matched-string))
+          (while (if (> migemo-dabbrev-search-point migemo-dabbrev-start-point)
+                     (and (migemo-forward migemo-dabbrev-pattern (point-max) t)
+                          (setq migemo-dabbrev-search-point (match-end 0)))
+                   (if (migemo-backward migemo-dabbrev-pattern (point-min) t)
+                       (setq migemo-dabbrev-search-point (match-beginning 0))
+                     (goto-char migemo-dabbrev-start-point)
+                     (forward-word 1)
+                     (message (format "Trun back for `%s'" migemo-dabbrev-pattern))
+                     (and (migemo-forward migemo-dabbrev-pattern (point-max) t)
+                          (setq migemo-dabbrev-search-point (match-end 0)))))
+            (setq matched-start (match-beginning 0))
+            (unless (re-search-forward ".\\>" (line-end-position) t)
+              (end-of-line))
+            (setq matched-string (buffer-substring-no-properties matched-start (point)))
+            (unless (member matched-string migemo-dabbrev-pre-patterns)
+              (let ((matched-end (point))
+                    (str (copy-sequence matched-string))
+                    lstart lend)
+                (if (and (pos-visible-in-window-p matched-start)
+                         (pos-visible-in-window-p matched-end))
+                    (progn
+                      (if migemo-dabbrev-ol
+                          (move-overlay migemo-dabbrev-ol matched-start (point))
+                        (setq migemo-dabbrev-ol (make-overlay matched-start (point))))
+                      (overlay-put migemo-dabbrev-ol 'evaporate t)
+                      (overlay-put migemo-dabbrev-ol 'face migemo-dabbrev-ol-face))
+                  (when migemo-dabbrev-ol
+                    (delete-overlay migemo-dabbrev-ol))
+                  (when migemo-dabbrev-display-message
+                    (save-excursion
+                      (save-restriction
+                        (goto-char matched-start)
+                        (setq lstart (progn (beginning-of-line) (point)))
+                        (setq lend (progn (end-of-line) (point)))
+                        (setq str (concat "【" str "】"))
+                        (message "(%d): %s%s%s"
+                                 (count-lines (point-min) matched-start)
+                                 (buffer-substring-no-properties lstart matched-start)
+                                 str
+                                 (buffer-substring-no-properties matched-end lend)))))))
+              (throw 'found t))
+            (goto-char migemo-dabbrev-search-point)))
+        (progn
+          (setq migemo-dabbrev-pre-patterns
+                (cons matched-string migemo-dabbrev-pre-patterns))
+          (delete-region migemo-dabbrev-start-point end-pos)
+          (forward-char 1)
+          (goto-char migemo-dabbrev-start-point)
+          (insert matched-string))
       (goto-char end-pos)
       (message (format "No dynamic expansion for `%s' found"
-               migemo-dabbrev-pattern)))
+                       migemo-dabbrev-pattern)))
     (add-hook 'pre-command-hook 'migemo-dabbrev-expand-done)))
 
 (defsubst migemo--isearch-regexp-function ()
@@ -529,7 +529,7 @@ into the migemo's regexp pattern."
   "adviced by migemo."
   (let ((isearch-adjusted isearch-adjusted))
     (when (and migemo-isearch-enable-p
-           (not isearch-forward) (not isearch-regexp) (not (migemo--isearch-regexp-function)))
+               (not isearch-forward) (not isearch-regexp) (not (migemo--isearch-regexp-function)))
       ;; don't use 'looking-at'
       (setq isearch-adjusted t))
     ad-do-it))
@@ -538,19 +538,19 @@ into the migemo's regexp pattern."
   "adviced by migemo."
   (if migemo-do-isearch
       (setq ad-return-value
-        (migemo-forward (ad-get-arg 0) (ad-get-arg 1) (ad-get-arg 2) (ad-get-arg 3)))
+            (migemo-forward (ad-get-arg 0) (ad-get-arg 1) (ad-get-arg 2) (ad-get-arg 3)))
     ad-do-it))
 
 (defadvice search-backward (around migemo-search-ad activate)
   "adviced by migemo."
   (if migemo-do-isearch
       (setq ad-return-value
-        (migemo-backward (ad-get-arg 0) (ad-get-arg 1) (ad-get-arg 2) (ad-get-arg 3)))
+            (migemo-backward (ad-get-arg 0) (ad-get-arg 1) (ad-get-arg 2) (ad-get-arg 3)))
     ad-do-it))
 
 (when (and (boundp 'isearch-regexp-lax-whitespace)
-       (fboundp 're-search-forward-lax-whitespace)
-       (fboundp 'search-forward-lax-whitespace))
+           (fboundp 're-search-forward-lax-whitespace)
+           (fboundp 'search-forward-lax-whitespace))
   (setq isearch-search-fun-function 'isearch-search-fun-migemo)
 
   (when (fboundp 'isearch-search-fun-default)
@@ -566,35 +566,35 @@ into the migemo's regexp pattern."
     (cond
      ((migemo--isearch-regexp-function)
       (lambda (string &optional bound noerror count)
-    ;; Use lax versions to not fail at the end of the word while
-    ;; the user adds and removes characters in the search string
-    ;; (or when using nonincremental word isearch)
-    (let* ((state-string-func (if (fboundp 'isearch--state-string)
-                      'isearch--state-string
-                    'isearch-string-state))
+        ;; Use lax versions to not fail at the end of the word while
+        ;; the user adds and removes characters in the search string
+        ;; (or when using nonincremental word isearch)
+        (let* ((state-string-func (if (fboundp 'isearch--state-string)
+                                      'isearch--state-string
+                                    'isearch-string-state))
                (lax (not (or isearch-nonincremental
-                (eq (length isearch-string)
-                (length (funcall state-string-func (car isearch-cmds))))))))
-      (funcall
-       (if isearch-forward #'re-search-forward #'re-search-backward)
-       (if (functionp (migemo--isearch-regexp-function))
-           (funcall (migemo--isearch-regexp-function) string lax)
-         (word-search-regexp string lax))
-       bound noerror count))))
+                             (eq (length isearch-string)
+                                 (length (funcall state-string-func (car isearch-cmds))))))))
+          (funcall
+           (if isearch-forward #'re-search-forward #'re-search-backward)
+           (if (functionp (migemo--isearch-regexp-function))
+               (funcall (migemo--isearch-regexp-function) string lax)
+             (word-search-regexp string lax))
+           bound noerror count))))
      ((and isearch-regexp isearch-regexp-lax-whitespace
-       search-whitespace-regexp)
+           search-whitespace-regexp)
       (if isearch-forward
-      're-search-forward-lax-whitespace
-    're-search-backward-lax-whitespace))
+          're-search-forward-lax-whitespace
+        're-search-backward-lax-whitespace))
      (isearch-regexp
       (if isearch-forward 're-search-forward 're-search-backward))
      ((and (if (boundp 'isearch-lax-whitespace) isearch-lax-whitespace t)
-               search-whitespace-regexp migemo-do-isearch)
+           search-whitespace-regexp migemo-do-isearch)
       (if isearch-forward 'migemo-forward 'migemo-backward))
      ((and (if (boundp 'isearch-lax-whitespace) isearch-lax-whitespace t)
-               search-whitespace-regexp)
+           search-whitespace-regexp)
       (if isearch-forward 'search-forward-lax-whitespace
-    'search-backward-lax-whitespace))
+        'search-backward-lax-whitespace))
      (migemo-do-isearch
       (if isearch-forward 'migemo-forward 'migemo-backward))
      (t
@@ -607,7 +607,7 @@ into the migemo's regexp pattern."
   (setq migemo-search-pattern nil)
   (setq migemo-search-pattern-alist nil)
   (when (and migemo-isearch-enable-p
-         (boundp 'current-input-method))
+             (boundp 'current-input-method))
     (setq migemo-current-input-method current-input-method)
     (setq migemo-current-input-method-title current-input-method-title)
     (setq migemo-input-method-function input-method-function)
@@ -626,7 +626,7 @@ into the migemo's regexp pattern."
   (setq migemo-search-pattern nil)
   (setq migemo-search-pattern-alist nil)
   (when (and migemo-isearch-enable-p
-         (boundp 'current-input-method))
+             (boundp 'current-input-method))
     (let ((state-changed-p (not (equal current-input-method migemo-current-input-method))))
       (setq current-input-method migemo-current-input-method)
       (setq current-input-method-title migemo-current-input-method-title)
@@ -647,7 +647,7 @@ into the migemo's regexp pattern."
 (defadvice isearch-message-prefix (after migemo-status activate)
   "adviced by migemo."
   (let ((ret ad-return-value)
-    (str "[MIGEMO]"))
+        (str "[MIGEMO]"))
     (when (and migemo-isearch-enable-p
                (not (or isearch-regexp (migemo--isearch-regexp-function))))
       (setq ad-return-value (concat str " " ret)))))
@@ -679,17 +679,17 @@ into the migemo's regexp pattern."
 ;;;; for isearch-highlightify-region (XEmacs 21)
 (when (fboundp 'isearch-highlightify-region)
   (defadvice isearch-highlightify-region (around migemo-highlightify-region
-                         activate)
+                                                 activate)
     "adviced by migemo."
     (if migemo-isearch-enable-p
-    (let ((isearch-string (migemo-search-pattern-get isearch-string))
-          (isearch-regexp t))
-      ad-do-it)
+        (let ((isearch-string (migemo-search-pattern-get isearch-string))
+              (isearch-regexp t))
+          ad-do-it)
       ad-do-it)))
 
 ;; supports C-w C-d for GNU emacs only [migemo:00171]
 (when (and (not (featurep 'xemacs))
-       (fboundp 'isearch-yank-line))
+           (fboundp 'isearch-yank-line))
   (defun migemo-register-isearch-keybinding ()
     (define-key isearch-mode-map "\C-d" 'migemo-isearch-yank-char)
     (define-key isearch-mode-map "\C-w" 'migemo-isearch-yank-word)
@@ -706,10 +706,10 @@ into the migemo's regexp pattern."
       (setq migemo-isearch-enable-p (not migemo-isearch-enable-p)))
     (when (fboundp 'isearch-lazy-highlight-new-loop)
       (let ((isearch-lazy-highlight-last-string nil))
-    (condition-case nil
-        (isearch-lazy-highlight-new-loop)
-      (error
-       (isearch-lazy-highlight-new-loop nil nil)))))
+        (condition-case nil
+            (isearch-lazy-highlight-new-loop)
+          (error
+           (isearch-lazy-highlight-new-loop nil nil)))))
     (isearch-message))
 
   (defun migemo-isearch-yank-char ()
@@ -721,13 +721,13 @@ into the migemo's regexp pattern."
                             isearch-other-end (point)))
       (setq isearch-message isearch-string))
     (let ((search-upper-case (unless migemo-isearch-enable-p
-                   search-upper-case)))
+                               search-upper-case)))
       (isearch-yank-string
        (save-excursion
-     (and (not isearch-forward) isearch-other-end
-          (goto-char isearch-other-end))
-     (buffer-substring-no-properties (point)
-                     (progn (forward-char 1) (point)))))))
+         (and (not isearch-forward) isearch-other-end
+              (goto-char isearch-other-end))
+         (buffer-substring-no-properties (point)
+                                         (progn (forward-char 1) (point)))))))
 
   (defun migemo-isearch-yank-word ()
     "Pull next character from buffer into search string with migemo."
@@ -738,13 +738,13 @@ into the migemo's regexp pattern."
                             isearch-other-end (point)))
       (setq isearch-message isearch-string))
     (let ((search-upper-case (unless migemo-isearch-enable-p
-                   search-upper-case)))
+                               search-upper-case)))
       (isearch-yank-string
        (save-excursion
-     (and (not isearch-forward) isearch-other-end
-          (goto-char isearch-other-end))
-     (buffer-substring-no-properties (point)
-                     (progn (forward-word 1) (point)))))))
+         (and (not isearch-forward) isearch-other-end
+              (goto-char isearch-other-end))
+         (buffer-substring-no-properties (point)
+                                         (progn (forward-word 1) (point)))))))
 
   (defun migemo-isearch-yank-line ()
     "Pull next character from buffer into search string with migemo."
@@ -755,14 +755,14 @@ into the migemo's regexp pattern."
                             isearch-other-end (point)))
       (setq isearch-message isearch-string))
     (let ((search-upper-case (unless migemo-isearch-enable-p
-                   search-upper-case)))
+                               search-upper-case)))
       (isearch-yank-string
        (save-excursion
-     (and (not isearch-forward) isearch-other-end
-          (goto-char isearch-other-end))
-     (buffer-substring-no-properties (point)
-                     (line-end-position))))))
-)
+         (and (not isearch-forward) isearch-other-end
+              (goto-char isearch-other-end))
+         (buffer-substring-no-properties (point)
+                                         (line-end-position))))))
+  )
 
 (add-hook 'kill-emacs-hook 'migemo-pattern-alist-save)
 
