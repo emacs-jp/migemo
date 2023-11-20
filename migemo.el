@@ -289,16 +289,16 @@
   (when (file-readable-p file)
     (with-temp-buffer
       (let ((coding-system-for-read migemo-coding-system)
-            (buffer-file-coding-system migemo-coding-system)))
-      (insert-file-contents file)
-      (goto-char (point-min))
-      (condition-case err
-          (read (current-buffer))
-        (error
-         (message "Error while reading %s; %s"
-                  (file-name-nondirectory file)
-                  (error-message-string err))
-         nil)))))
+            (buffer-file-coding-system migemo-coding-system))
+        (insert-file-contents file)
+        (goto-char (point-min))
+        (condition-case err
+            (read (current-buffer))
+          (error
+           (message "Error while reading %s; %s"
+                    (file-name-nondirectory file)
+                    (error-message-string err))
+           nil))))))
 
 (defun migemo-pattern-alist-save (&optional clear)
   "Save migemo alist file."
@@ -354,26 +354,26 @@
       (setq migemo-frequent-pattern-alist nil)
       (with-temp-buffer
         (let ((coding-system-for-write migemo-coding-system)
-              (buffer-file-coding-system migemo-coding-system)))
-        (insert-file-contents fcfile)
-        (goto-char (point-min))
-        (message "Make frequently pattern...")
-        (while (not (eobp))
-          (when (looking-at "^[a-z]+$")
-            (setq word (match-string 0))
-            (message "Make frequently pattern...%s" word)
+              (buffer-file-coding-system migemo-coding-system))
+          (insert-file-contents fcfile)
+          (goto-char (point-min))
+          (message "Make frequently pattern...")
+          (while (not (eobp))
+            (when (looking-at "^[a-z]+$")
+              (setq word (match-string 0))
+              (message "Make frequently pattern...%s" word)
+              (setq migemo-frequent-pattern-alist
+                    (cons (cons word (migemo-get-pattern word))
+                          migemo-frequent-pattern-alist)))
+            (forward-line 1))
+          (when (file-writable-p file)
             (setq migemo-frequent-pattern-alist
-                  (cons (cons word (migemo-get-pattern word))
-                        migemo-frequent-pattern-alist)))
-          (forward-line 1))
-        (when (file-writable-p file)
-          (setq migemo-frequent-pattern-alist
-                (nreverse migemo-frequent-pattern-alist))
-          (erase-buffer)
-          (if (fboundp 'pp)
-              (pp migemo-frequent-pattern-alist (current-buffer))
-            (prin1 migemo-frequent-pattern-alist (current-buffer)))
-          (write-region (point-min) (point-max) file nil 'nomsg)))
+                  (nreverse migemo-frequent-pattern-alist))
+            (erase-buffer)
+            (if (fboundp 'pp)
+                (pp migemo-frequent-pattern-alist (current-buffer))
+              (prin1 migemo-frequent-pattern-alist (current-buffer)))
+            (write-region (point-min) (point-max) file nil 'nomsg))))
       (migemo-kill)
       (migemo-init)
       (message "Make frequently pattern...done"))))
