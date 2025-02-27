@@ -1,4 +1,4 @@
-# migemo.el
+# migemo.el ![](https://github.com/emacs-jp/migemo/workflows/CI/badge.svg)
 
 migemo.el provides Japanese increment search with 'Romanization of Japanese'(ローマ字).
 
