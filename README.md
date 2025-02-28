@@ -1,4 +1,4 @@
-# migemo.el
+# migemo.el ![](https://github.com/emacs-jp/migemo/workflows/CI/badge.svg)
 
 migemo.el provides Japanese increment search with 'Romanization of Japanese'(ローマ字).
 
@@ -10,8 +10,7 @@ migemo.el provides Japanese increment search with 'Romanization of Japanese'(ロ
 
 ## Requirements
 
-* Emacs 24 or higher.
-* cl-lib.el
+* Emacs 25 or higher.
 * [cmigemo](https://github.com/koron/cmigemo) or [CVS Head migemo](http://0xcc.net/migemo/)
   * We recommend to use cmigemo. It is default since version 1.9.2
 
