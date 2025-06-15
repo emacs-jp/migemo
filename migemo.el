@@ -623,9 +623,10 @@ into the migemo's regexp pattern."
 
 (defun migemo--isearch-message-prefix (orig-val)
   (let ((str "[MIGEMO]"))
-    (when (and migemo-isearch-enable-p
-               (not (or isearch-regexp (migemo--isearch-regexp-function))))
-      (concat str " " orig-val))))
+    (if (and migemo-isearch-enable-p
+             (not (or isearch-regexp (migemo--isearch-regexp-function))))
+        (concat str " " orig-val)
+      orig-val)))
 (advice-add 'isearch-message-prefix :filter-return #'migemo--isearch-message-prefix)
 
 (defun migemo--isearch-lazy-highlight-new-loop (orig-fun &rest args)
